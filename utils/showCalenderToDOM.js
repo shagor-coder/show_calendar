@@ -1,16 +1,25 @@
-import replaceInnerText from "./replaceInnerText";
+import replaceInnerText from './replaceInnerText';
+
+const calendlyScript = document.createElement('script');
+calendlyScript.src = 'https://assets.calendly.com/assets/external/widget.js';
+calendlyScript.async = '';
 
 const showCalendarToDOM = (calendarURL, userInfo) => {
-  const calendarContainer = document.querySelector("#calendar_embed");
-  if (!calendarContainer) return;
+	const calendarContainers = [...document.querySelectorAll('.calendar_embed')];
+	if (!calendarContainers.length) return;
 
-  calendarContainer.innerHTML = `
-    <iframe src="${calendarURL}" style="height:100%;width: 100%;border:none;overflow: auto;" scrolling="no"></iframe>
-  `;
+	calendarContainers.forEach((calendarContainer) => {
+		calendarContainer.innerHTML = `
+    <div class="calendly-inline-widget" data-url=${calendarURL} style="min-width:320px;height:660px;">
+    </div>
+    `;
 
-  const userInfoElement = document.querySelectorAll(".userInfo");
-  if (!userInfo) return;
-  replaceInnerText(userInfoElement, userInfo, "user.");
+		calendarContainer.append(calendlyScript);
+	});
+
+	const userInfoElement = document.querySelectorAll('.userInfo');
+	if (!userInfo) return;
+	replaceInnerText(userInfoElement, userInfo, 'user.');
 };
 
 export default showCalendarToDOM;

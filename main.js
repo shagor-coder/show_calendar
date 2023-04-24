@@ -1,48 +1,46 @@
-import getContactByEmail from "./utils/getContactByEmail";
-import getUserById from "./utils/getUserById";
-import showCalendarToDOM from "./utils/showCalenderToDOM";
+import getCalendlyURL from './utils/getCalendlyURL';
+import getContactByEmail from './utils/getContactByEmail';
+import getUserById from './utils/getUserById';
+import showCalendarToDOM from './utils/showCalenderToDOM';
 
 const getCalendarURL = async () => {
-  const url = new URL(location.href);
+	const url = new URL(location.href);
 
-  const id = url.searchParams.get("id");
+	const id = url.searchParams.get('id');
 
-  if (!id) return;
+	if (!id) return;
 
-  const contact = await getContactByEmail(id.trim().replaceAll(" ", ""));
-  if (!contact) return;
+	const contact = await getContactByEmail(id.trim().replaceAll(' ', ''));
+	if (!contact) return;
 
-  console.log(contact);
+	console.log(contact);
 
-  const customFields = contact.customField;
+	const contactAssignedId = contact.assignedTo ? contact.assignedTo : '';
 
-  if (!customFields) return;
+	const associatedUser = await getUserById(contactAssignedId);
 
-  const calendarLinkField = customFields.find((customField) => {
-    return customField.id.trim() === "rdM4um58D7th4eLjjKx8";
-  });
+	if (!associatedUser) return;
 
-  if (!calendarLinkField) return;
+	const userCustomField = await getCalendlyURL(associatedUser.email);
 
-  const calendarLink = calendarLinkField.value;
+	console.log(userCustomField);
 
-  const contactAssignedId = contact.assignedTo ? contact.assignedTo : "";
+	if (!userCustomField.value) return;
 
-  const associatedUser = await getUserById(contactAssignedId);
+	const calendarLink = userCustomField.value.trim();
 
-  if (!associatedUser) return;
+	const associatedUserName = associatedUser.name ? associatedUser.name : '';
+	const associatedUserPhone = associatedUser.phone ? associatedUser.phone : '';
 
-  const associatedUserName = associatedUser.name ? associatedUser.name : "";
-  const associatedUserPhone = associatedUser.phone ? associatedUser.phone : "";
+	const userProfile = {
+		name: associatedUserName,
+		phone: associatedUserPhone,
+		contact_name: contact.firstName,
+	};
 
-  const userProfile = {
-    name: associatedUserName,
-    phone: associatedUserPhone,
-  };
-
-  showCalendarToDOM(calendarLink, userProfile);
+	showCalendarToDOM(calendarLink, userProfile);
 };
 
 setTimeout(() => {
-  getCalendarURL();
+	getCalendarURL();
 }, 5000);
