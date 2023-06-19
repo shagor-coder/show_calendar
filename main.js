@@ -13,32 +13,40 @@ const getCalendarURL = async () => {
 	const contact = await getContactByEmail(id.trim().replaceAll(' ', ''));
 	if (!contact) return;
 
-	console.log(contact);
-
 	const contactAssignedId = contact.assignedTo ? contact.assignedTo : '';
 
 	const associatedUser = await getUserById(contactAssignedId);
 
 	if (!associatedUser) return;
 
-	const userCustomField = await getCalendlyURL(associatedUser.email);
+	// const userCustomField = await getCalendlyURL(associatedUser.email);
 
-	console.log(userCustomField);
+	// console.log(userCustomField);
 
-	if (!userCustomField.value) return;
+	// if (!userCustomField.value) return;
 
-	const calendarLink = userCustomField.value.trim();
+	// const calendarLink = userCustomField.value.trim();
+
+	const customFields = contact.customField;
+	if (!customFields) return;
+	const calendarLink = customFields.find(
+		(field) => field.id.trim() === 'rdM4um58D7th4eLjjKx8'
+	);
+	if (!calendarLink) return;
 
 	const associatedUserName = associatedUser.name ? associatedUser.name : '';
 	const associatedUserPhone = associatedUser.phone ? associatedUser.phone : '';
+	const contactName = contact.firstName ? contact.firstName : '';
 
 	const userProfile = {
 		name: associatedUserName,
 		phone: associatedUserPhone,
-		contact_name: contact.firstName,
+		contact_name: contactName,
 	};
 
-	showCalendarToDOM(calendarLink, userProfile);
+	console.log(userProfile);
+
+	showCalendarToDOM(calendarLink.value, userProfile);
 };
 
 setTimeout(() => {
